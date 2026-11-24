@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#071b16">
+<title>Insekt Browser</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#071b16;color:#fff;
+ font-family:Arial,sans-serif;padding:18px;
+}
+header{
+ display:flex;justify-content:space-between;
+ align-items:center;margin-bottom:25px;
+}
+.logo{font-size:25px;font-weight:bold;color:#38e69b}
+.lock{font-size:23px}
+.address{
+ display:flex;gap:8px;background:#132d25;
+ border:1px solid #285342;border-radius:15px;
+ padding:8px;margin-bottom:25px;
+}
+.address input{
+ flex:1;min-width:0;background:transparent;
+ border:0;outline:0;color:white;font-size:15px;
+}
+.address button,.add{
+ background:#21c982;color:#052017;border:0;
+ border-radius:10px;padding:10px 15px;font-weight:bold;
+}
+h2{font-size:20px;margin-bottom:8px}
+.status{color:#38e69b;font-size:13px;margin-bottom:22px}
+.section{
+ background:#10271f;border:1px solid #234b3a;
+ border-radius:17px;padding:16px;margin-bottom:18px;
+}
+.section-head{
+ display:flex;justify-content:space-between;
+ align-items:center;margin-bottom:15px;
+}
+.shortcuts{
+ display:grid;grid-template-columns:repeat(4,1fr);gap:9px;
+}
+.shortcut{
+ background:#19382c;border-radius:13px;
+ padding:15px 5px;text-align:center;
+ font-size:13px;cursor:pointer;
+}
+.shortcut b{display:block;font-size:23px;margin-bottom:8px}
+.empty{text-align:center;color:#9bb4a8;padding:15px 0}
+.economy{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;
+}
+.economy small{display:block;color:#9bb4a8;margin-top:6px}
+.switch{width:48px;height:27px;accent-color:#21c982}
+nav{
+ position:fixed;bottom:0;left:0;right:0;
+ background:#10271f;border-top:1px solid #285342;
+ display:flex;justify-content:space-around;
+ padding:12px 4px calc(12px + env(safe-area-inset-bottom));
+}
+nav button{
+ color:#a8c2b5;background:none;border:0;
+ font-size:12px;display:flex;flex-direction:column;
+ align-items:center;gap:5px;
+}
+nav button span{font-size:21px}
+nav button.active{color:#38e69b}
+main{padding-bottom:90px}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">🎮 INSEKT</div>
+ <div class="lock">🔒</div>
+</header>
+
+<div class="address">
+ <input id="address" placeholder="ابحث أو أدخل عنوان الموقع">
+ <button onclick="navigate()">➜</button>
+</div>
+
+<main>
+ <h2>مرحبًا بك</h2>
+ <div class="status">● متصل</div>
+
+ <section class="section">
+  <div class="section-head">
+   <h2>اختصارات</h2>
+   <button class="add" onclick="addShortcut()">+ إضافة</button>
+  </div>
+
+  <div class="shortcuts">
+   <div class="shortcut" onclick="openSite('https://youtube.com')"><b>▶</b>YouTube</div>
+   <div class="shortcut" onclick="openSite('https://google.com')"><b>G</b>Google</div>
+   <div class="shortcut" onclick="openSite('https://facebook.com')"><b>f</b>Facebook</div>
+   <div class="shortcut" onclick="openSite('https://wikipedia.org')"><b>W</b>Wikipedia</div>
+  </div>
+ </section>
+
+ <section class="section">
+  <div class="section-head">
+   <h2>التنزيلات</h2>
+   <button class="add" onclick="clearDownloads()">مسح الكل</button>
+  </div>
+  <div class="empty" id="downloads">لا توجد تنزيلات نشطة</div>
+ </section>
+
+ <section class="section">
+  <div class="economy">
+   <div>
+    <h2>توفير الإنترنت</h2>
+    <strong>الوضع الاقتصادي</strong>
+    <small>ضغط البيانات ومنع الإعلانات</small>
+   </div>
+   <input class="switch" type="checkbox" id="economy">
+  </div>
+ </section>
+</main>
+
+<nav>
+ <button class="active" onclick="goHome()"><span>⌂</span>الرئيسية</button>
+ <button onclick="showMessage('التبويبات')"><span>▤</span>التبويبات</button>
+ <button onclick="showDownloads()"><span>⬇</span>التنزيلات</button>
+ <button onclick="showMessage('المزيد')"><span>⋮</span>المزيد</button>
+</nav>
+
+<script>
+function openSite(url){
+ if(window.Insekt && Insekt.openUrl){
+  Insekt.openUrl(url);
+ }else{
+  window.open(url,'_blank');
+ }
+}
+
+function navigate(){
+ let value=document.getElementById('address').value.trim();
+ if(!value)return;
+
+ let url;
+ if(/^https?:\/\//i.test(value)){
+  url=value;
+ }else if(/^[^\s]+\.[^\s]+$/.test(value)){
+  url='https://'+value;
+ }else{
+  url='https://www.google.com/search?q='+encodeURIComponent(value);
+ }
+ openSite(url);
+}
+
+document.getElementById('address').addEventListener('keydown',function(e){
+ if(e.key==='Enter')navigate();
+});
+
+function goHome(){
+ if(window.Insekt && Insekt.goHome){
+  Insekt.goHome();
+ }else{
+  location.reload();
+ }
+}
+
+function addShortcut(){
+ let url=prompt('أدخل رابط الموقع');
+ if(url){
+  if(!/^https?:\/\//i.test(url))url='https://'+url;
+  openSite(url);
+ }
+}
+
+function clearDownloads(){
+ document.getElementById('downloads').textContent='لا توجد تنزيلات نشطة';
+}
+
+function showDownloads(){
+ document.getElementById('downloads').scrollIntoView({behavior:'smooth'});
+}
+
+function showMessage(name){
+ alert(name+' ستتم إضافتها في التحديث القادم');
+}
+</script>
+
+</body>
+</html>
